@@ -1,83 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Siphon - Prototype</title>
-  <style>
-    body { 
-      background-color: #050505; 
-      color: #00ffcc; 
-      text-align: center; 
-      font-family: monospace; 
-      /* Stop the screen from scrolling when pressing arrow keys */
-      overflow: hidden; 
-    }
-    canvas { 
-      background-color: #111; 
-      border: 2px solid #00ffcc; 
-      box-shadow: 0 0 15px #00ffcc; 
-      margin-top: 30px; 
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SIPHON — The High-Voltage Core (Prototype)</title>
+<link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <h1>SIPHON : PROTOTYPE V12</h1>
-  <canvas id="gameCanvas" width="800" height="500"></canvas>
-  
-  <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
 
-    // 1. Create the Player Object
-    let player = {
-      x: 375,
-      y: 225,
-      size: 50,
-      speed: 5
-    };
+  <!-- ========== START SCREEN ========== -->
+  <div id="start-screen" class="overlay">
+    <div class="panel">
+      <h1>SIPHON<span class="accent">_</span></h1>
+      <p class="subtitle">Unit 4 — The High-Voltage Core</p>
+      <p class="lore">
+        The corporation hoards every watt while the lower cities rot in the dark.
+        You are a Siphoner. Get in, drain the grid, get out.
+        The Warden is already awake.
+      </p>
+      <div class="howto">
+        <h2>Controls</h2>
+        <ul>
+          <li><b>WASD</b> — move</li>
+          <li><b>SHIFT</b> — run (louder, easier to spot)</li>
+          <li><b>SPACE</b> — Holo-Belt disguise (15s, then it needs to recharge)</li>
+          <li><b>E</b> — interact with a task console</li>
+        </ul>
+        <p class="hint">Complete all 3 task consoles, then reach the glowing exit gate before the Warden finds you.</p>
+      </div>
+      <button id="start-btn">ENTER THE CORE</button>
+    </div>
+  </div>
 
-    // 2. Track which keys are being pressed
-    let keys = {};
-    
-    window.addEventListener("keydown", (e) => {
-      keys[e.key] = true;
-    });
-    
-    window.addEventListener("keyup", (e) => {
-      keys[e.key] = false;
-    });
+  <!-- ========== END SCREENS ========== -->
+  <div id="end-screen" class="overlay hidden">
+    <div class="panel">
+      <h1 id="end-title">—</h1>
+      <p id="end-message" class="subtitle"></p>
+      <button id="restart-btn">TRY AGAIN</button>
+    </div>
+  </div>
 
-    // 3. Update the player's position based on keys
-    function update() {
-      if (keys["ArrowUp"] || keys["w"]) player.y -= player.speed;
-      if (keys["ArrowDown"] || keys["s"]) player.y += player.speed;
-      if (keys["ArrowLeft"] || keys["a"]) player.x -= player.speed;
-      if (keys["ArrowRight"] || keys["d"]) player.x += player.speed;
+  <!-- ========== TASK MINIGAME OVERLAY ========== -->
+  <div id="task-overlay" class="overlay hidden">
+    <div class="panel task-panel">
+      <h2>PHASE ALIGNMENT</h2>
+      <p class="subtitle">Connect the wires in the order shown before time runs out.</p>
+      <div id="task-sequence" class="task-sequence"></div>
+      <div id="task-buttons" class="task-buttons">
+        <button class="wire-btn wire-red" data-color="red">RED</button>
+        <button class="wire-btn wire-yellow" data-color="yellow">YELLOW</button>
+        <button class="wire-btn wire-blue" data-color="blue">BLUE</button>
+      </div>
+      <div class="task-timer-track"><div id="task-timer-fill" class="task-timer-fill"></div></div>
+    </div>
+  </div>
 
-      // Keep the player inside the canvas boundaries
-      player.x = Math.max(0, Math.min(canvas.width - player.size, player.x));
-      player.y = Math.max(0, Math.min(canvas.height - player.size, player.y));
+  <!-- ========== IN-GAME HUD ========== -->
+  <div id="hud" class="hidden">
+    <div class="hud-top-left">
+      <div class="hud-label">GRID CHARGE</div>
+      <div class="bar-track"><div id="task-progress-fill" class="bar-fill progress"></div></div>
+
+      <div class="hud-label small">HOLO-BELT</div>
+      <div class="bar-track"><div id="belt-fill" class="bar-fill belt"></div></div>
+    </div>
+
+    <div id="alert-banner" class="alert-banner hidden">WARDEN ALERTED</div>
+    <div id="interact-prompt" class="interact-prompt hidden">[E] ACCESS CONSOLE</div>
+    <div id="escape-prompt" class="interact-prompt hidden">[E] ESCAPE</div>
+  </div>
+
+  <canvas id="game-canvas"></canvas>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+      }
     }
-
-    // 4. Draw everything on the screen
-    function draw() {
-      // Clear the previous frame (paint the background dark grey again)
-      ctx.fillStyle = "#111";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Draw the updated player
-      ctx.fillStyle = "#ff0055"; 
-      ctx.fillRect(player.x, player.y, player.size, player.size);
-    }
-
-    // 5. The Game Loop (runs 60 times a second)
-    function gameLoop() {
-      update();
-      draw();
-      requestAnimationFrame(gameLoop); // Tells the browser to keep looping
-    }
-
-    // Start the game!
-    gameLoop();
   </script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
