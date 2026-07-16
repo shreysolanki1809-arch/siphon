@@ -8,6 +8,8 @@
       color: #00ffcc; 
       text-align: center; 
       font-family: monospace; 
+      /* Stop the screen from scrolling when pressing arrow keys */
+      overflow: hidden; 
     }
     canvas { 
       background-color: #111; 
@@ -19,16 +21,63 @@
 </head>
 <body>
   <h1>SIPHON : PROTOTYPE V1</h1>
-  <!-- This is the game screen -->
   <canvas id="gameCanvas" width="800" height="500"></canvas>
   
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
-    // Drawing a temporary player box on screen
-    ctx.fillStyle = "#ff0055"; 
-    ctx.fillRect(375, 225, 50, 50); 
+    // 1. Create the Player Object
+    let player = {
+      x: 375,
+      y: 225,
+      size: 50,
+      speed: 5
+    };
+
+    // 2. Track which keys are being pressed
+    let keys = {};
+    
+    window.addEventListener("keydown", (e) => {
+      keys[e.key] = true;
+    });
+    
+    window.addEventListener("keyup", (e) => {
+      keys[e.key] = false;
+    });
+
+    // 3. Update the player's position based on keys
+    function update() {
+      if (keys["ArrowUp"] || keys["w"]) player.y -= player.speed;
+      if (keys["ArrowDown"] || keys["s"]) player.y += player.speed;
+      if (keys["ArrowLeft"] || keys["a"]) player.x -= player.speed;
+      if (keys["ArrowRight"] || keys["d"]) player.x += player.speed;
+
+      // Keep the player inside the canvas boundaries
+      player.x = Math.max(0, Math.min(canvas.width - player.size, player.x));
+      player.y = Math.max(0, Math.min(canvas.height - player.size, player.y));
+    }
+
+    // 4. Draw everything on the screen
+    function draw() {
+      // Clear the previous frame (paint the background dark grey again)
+      ctx.fillStyle = "#111";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw the updated player
+      ctx.fillStyle = "#ff0055"; 
+      ctx.fillRect(player.x, player.y, player.size, player.size);
+    }
+
+    // 5. The Game Loop (runs 60 times a second)
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop); // Tells the browser to keep looping
+    }
+
+    // Start the game!
+    gameLoop();
   </script>
 </body>
 </html>
